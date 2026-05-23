@@ -59,6 +59,44 @@ The three docs form a **triad**:
 - **hub#333** — services.json row deduplication: same-port `parachute-X` ↔ `X` pairs auto-cleaned; retired-module rows (e.g. `agent`) auto-removed with operator-actionable warnings
 - **hub#336** — operator-facing help text references `parachute install app` as canonical (notes-daemon = back-compat)
 
+## MORNING SESSION UPDATE (post-Aaron-awake)
+
+Aaron asked: (1) Render rc-cascade deploy, (2) finish clear issues, (3) drop kind everywhere.
+
+**Morning merges (9 across 8 repos):**
+
+| Repo | PR | Work |
+|---|---|---|
+| hub | #337/#339 | `parachute install --channel` + `PARACHUTE_INSTALL_CHANNEL` env + Render rc-cascade. Plus fold: upgrade also honors the env (symmetry). |
+| app | #28 | `TagSchemaDeclaration.parent_names` for hierarchical schemas (app#19) |
+| app | #29 | drop kind from app's module.json (Phase B) |
+| vault | #359 | drop kind from vault's module.json + make vault's own reader accept missing kind |
+| scribe | #52 | drop kind from scribe's module.json |
+| runner | #7 | drop kind from runner's module.json |
+| patterns | #84 | drop kind references from 6 pattern docs (Phase B doc cleanup) |
+| notes | #164 | migrate to @openparachute/app-client helpers (notes#163, folds #162 nits) |
+| .computer | #57 | design doc §9 note: runtime-tenancy supersedes build-time-mount |
+
+**In flight**: hub kind retirement Phase C/D (drop type alias + parser + upgrade.ts `kind === "frontend"` branch + KNOWN_MODULES kind fields). Closes hub#330.
+
+**Filed**: hub#340 (info-endpoint kind cleanup across modules — runtime endpoint still emits kind: "api", separate surface from manifest).
+
+## Render rc-cascade deploy ready
+
+```bash
+# Fork parachute-hub, point Render Blueprint at render.yaml.
+# Render auto-deploys main; env var PARACHUTE_INSTALL_CHANNEL=rc is set.
+# Wizard or admin SPA installs other modules → all use @rc.
+```
+
+The `render.yaml` defaults `PARACHUTE_INSTALL_CHANNEL=rc`. Hub at rc.18 (rc.19 once Phase C/D lands) cascades to:
+- vault@rc installed via admin SPA → 0.4.8-rc.5
+- app@rc → 0.2.0-rc.10
+- scribe@rc → 0.4.4-rc.6
+- runner@rc → 0.1.0-rc.6
+
+Operator can override per-install via body.channel or per-cluster via env / DB toggle.
+
 ## Final state — no open PRs
 
 All architecture work for tonight merged. The canonical contract is now end-to-end:
