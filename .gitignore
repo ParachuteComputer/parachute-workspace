@@ -1,0 +1,52 @@
+# ParachuteComputer workspace meta-repo
+#
+# Strategy: ignore everything by default; allowlist what we want tracked.
+# This is a workspace container — every sibling repo here (parachute-*) is
+# its own git repo. We track only workspace-level orchestration: the
+# CLAUDE.md, the custom .claude/ skills/agents, workspace docs, scratch
+# session-state notes.
+
+# ── Default: ignore everything ──
+*
+
+# ── Allowlist: workspace meta files ──
+!.gitignore
+!CLAUDE.md
+!README.md
+
+# ── Allowlist: workspace docs (historical + session) ──
+# Move historical workspace-root artifacts (DESIGN-*, BETA-EMAIL-*,
+# BLOG-OUTLINE-*, RELEASE-NOTES-*, WAKE-UP-*, etc.) into docs/ if you
+# want them tracked. Until then, leave them ignored.
+!docs/
+!docs/**
+
+# ── Allowlist: scratch session notes ──
+# Handoffs, process audits, thinking docs. Tracked because they're
+# knowledge about how we work, not ephemeral state.
+!scratch/
+!scratch/**
+
+# ── Allowlist: .claude/ workspace customization ──
+# Custom agents, slash commands, workspace-level settings.
+# NOT user-level state (history, cache, etc. — those live in ~/.claude/).
+!.claude/
+!.claude/**
+
+# ── Within .claude/: explicit per-file ignores ──
+# settings.local.json contains operator-local paths (different per machine);
+# track a settings.json template instead and let each operator override.
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/cache/
+.claude/history*
+
+# ── Sub-repos (every parachute-*, plus exploration repos) ──
+# Each is its own git repo with its own .git/. Ignoring at this level
+# means git status doesn't recurse into them. They're not tracked, not
+# submodules — they're parallel checkouts coordinated by convention.
+# (No explicit listing needed since `*` already ignores them.)
+
+# ── Operator-local ──
+# Anything starting with a dot at the root that isn't allowlisted above
+# is ignored. This includes .DS_Store, editor state, etc.
