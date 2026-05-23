@@ -59,20 +59,50 @@ The three docs form a **triad**:
 - **hub#333** — services.json row deduplication: same-port `parachute-X` ↔ `X` pairs auto-cleaned; retired-module rows (e.g. `agent`) auto-removed with operator-actionable warnings
 - **hub#336** — operator-facing help text references `parachute install app` as canonical (notes-daemon = back-compat)
 
-## Open PRs (post-update — most landed)
+## Open PRs (post-update — getting cleaner)
 
-- **hub#338** — `parachute upgrade` preserves your channel (`@rc` if on rc, `@latest` if stable) and refuses silent downgrades. Closes hub#332. Reviewer dispatched, awaiting result.
-- **app#22 (in flight)** — `@openparachute/app-client` helpers: `getMountBase()`, `getTenantId()`, `getHubOrigin()`, `getVaultUrl()`. The consumer side of the runtime tenancy contract. Agent still implementing.
+- **app#27** — `@openparachute/app-client` helpers: `getMountBase()`, `getTenantId()`, `getHubOrigin()`, `getVaultUrl()`. Reviewer dispatched, awaiting result.
 
 ### Already merged (since first version of this doc):
-- **app#25** — tenancy injection ($<base href>$ + meta tags) MERGED. App rc.8 on main.
+- **app#25** — tenancy injection ($<base href>$ + meta tags). App rc.8 on main.
+- **hub#338** — `parachute upgrade` channel detection + downgrade refusal. Hub rc.17 on main.
 
-When hub#338 and app#22 land:
-- Hub rc.17 (with upgrade channel fix)
-- App-client rc.4 (with helpers — Aaron may NOT need to publish this; depends on whether anyone consumes it yet)
-- Notes-ui can migrate to use the helpers (next PR after #22)
+When app#27 lands → app-client rc.4 ready. Then a final notes-ui PR migrating from local regex to the library helpers can ship (or you can do that yourself later).
 
-Hub#337 filed for the related install-command channel-default issue (separate fix shape).
+Hub#337 filed for the related install-command channel-default issue (separate fix shape, lower priority — install has no installed version to detect from, so the fix is "choose a default channel for fresh installs").
+
+## Publish queue for your morning
+
+Once all PRs land (or just what's already on main):
+
+```bash
+# notes-ui to stable
+cd ~/ParachuteComputer/parachute-notes/packages/notes-ui
+git checkout main && git pull && bun install && bun run build
+npm publish --tag latest                       # → 0.1.2
+
+# hub (latest is rc.17 with both #336 and #338)
+cd ~/ParachuteComputer/parachute-hub
+git checkout main && git pull && bun install
+npm publish --tag rc                           # → 0.5.13-rc.17
+
+# app (latest is rc.8 with both SPA-fallback fix + tenancy injection)
+cd ~/ParachuteComputer/parachute-app/packages/app-host
+git checkout main && git pull && bun install
+npm publish --tag rc                           # → 0.2.0-rc.8
+
+# app-client (if #27 merges before you wake)
+cd ~/ParachuteComputer/parachute-app/packages/app-client
+npm publish --tag rc                           # → 0.1.0-rc.4
+```
+
+Then upgrade locally and restart everything. With all three published, install loop should be bulletproof:
+- App rc.8 injects `<base href>` (trailing-slash issue gone)
+- App rc.8 injects `<meta name="parachute-mount">` + `<meta name="parachute-hub">`
+- Notes-ui 0.1.2 detects mount via meta tags (first), regex fallback if absent
+- Notes-ui 0.1.2 doesn't register SW when mount doesn't match (no more workbox interception of OAuth callback)
+- Hub rc.17 dedupes services.json (no more duplicate-port errors)
+- Hub rc.17 doesn't downgrade you on `parachute upgrade`
 
 ## Architectural through-line you said yes to
 
