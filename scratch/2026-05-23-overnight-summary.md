@@ -59,12 +59,20 @@ The three docs form a **triad**:
 - **hub#333** — services.json row deduplication: same-port `parachute-X` ↔ `X` pairs auto-cleaned; retired-module rows (e.g. `agent`) auto-removed with operator-actionable warnings
 - **hub#336** — operator-facing help text references `parachute install app` as canonical (notes-daemon = back-compat)
 
-## Open PRs (left for your review/merge)
+## Open PRs (post-update — most landed)
 
-- **app#25** — tenancy contract injection: `<base href>` + `<meta name="parachute-mount">` + `<meta name="parachute-hub">` in served index.html. Closes app#21. Reviewer dispatched, awaiting result.
-- **hub#332** — `parachute upgrade` preserves your channel (`@rc` if on rc, `@latest` if stable) and refuses silent downgrades. Closes hub#332. Agent still implementing as of write time.
+- **hub#338** — `parachute upgrade` preserves your channel (`@rc` if on rc, `@latest` if stable) and refuses silent downgrades. Closes hub#332. Reviewer dispatched, awaiting result.
+- **app#22 (in flight)** — `@openparachute/app-client` helpers: `getMountBase()`, `getTenantId()`, `getHubOrigin()`, `getVaultUrl()`. The consumer side of the runtime tenancy contract. Agent still implementing.
 
-When those land, app rc.8 + hub rc.17 are queued for publish.
+### Already merged (since first version of this doc):
+- **app#25** — tenancy injection ($<base href>$ + meta tags) MERGED. App rc.8 on main.
+
+When hub#338 and app#22 land:
+- Hub rc.17 (with upgrade channel fix)
+- App-client rc.4 (with helpers — Aaron may NOT need to publish this; depends on whether anyone consumes it yet)
+- Notes-ui can migrate to use the helpers (next PR after #22)
+
+Hub#337 filed for the related install-command channel-default issue (separate fix shape).
 
 ## Architectural through-line you said yes to
 
