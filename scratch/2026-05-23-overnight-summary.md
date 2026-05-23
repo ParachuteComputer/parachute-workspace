@@ -59,15 +59,16 @@ The three docs form a **triad**:
 - **hub#333** — services.json row deduplication: same-port `parachute-X` ↔ `X` pairs auto-cleaned; retired-module rows (e.g. `agent`) auto-removed with operator-actionable warnings
 - **hub#336** — operator-facing help text references `parachute install app` as canonical (notes-daemon = back-compat)
 
-## Open PRs (post-update — getting cleaner)
+## Final state — no open PRs
 
-- **app#27** — `@openparachute/app-client` helpers: `getMountBase()`, `getTenantId()`, `getHubOrigin()`, `getVaultUrl()`. Reviewer dispatched, awaiting result.
+All architecture work for tonight merged. The canonical contract is now end-to-end:
 
-### Already merged (since first version of this doc):
-- **app#25** — tenancy injection ($<base href>$ + meta tags). App rc.8 on main.
-- **hub#338** — `parachute upgrade` channel detection + downgrade refusal. Hub rc.17 on main.
+- **app#25** ✓ producer side (host injects `<base href>` + meta tags into served HTML)
+- **app#27** ✓ consumer side (`@openparachute/app-client` rc.4 exports `getMountBase()`, `getTenantId()`, `getHubOrigin()`, `getVaultUrl()`)
+- **hub#338** ✓ upgrade channel detection + downgrade refusal
+- All canonical-contract issues (app#21, app#22, hub#332) closed
 
-When app#27 lands → app-client rc.4 ready. Then a final notes-ui PR migrating from local regex to the library helpers can ship (or you can do that yourself later).
+The follow-up notes-ui migration to use the helpers is filed at **notes#163** — not load-bearing (notes-ui 0.1.2's meta-tag check already works through its regex fallback); ship when you want the cleanliness.
 
 Hub#337 filed for the related install-command channel-default issue (separate fix shape, lower priority — install has no installed version to detect from, so the fix is "choose a default channel for fresh installs").
 
