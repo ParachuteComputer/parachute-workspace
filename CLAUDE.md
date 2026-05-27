@@ -11,7 +11,7 @@ The four committed-core modules are the product surface. Two more repos (pattern
 | Repo | Role | Status |
 |---|---|---|
 | [`parachute-vault`](./parachute-vault) | Vault — knowledge graph + MCP | committed core |
-| [`parachute-surface`](./parachute-surface) | App — UI host module + bundled reference apps (notes-ui moved here 2026-05-24; future apps like calendar / tasks land alongside) | committed core |
+| [`parachute-surface`](./parachute-surface) | Surface — UI host module + bundled reference surfaces (notes-ui moved here 2026-05-24; future surfaces like calendar / tasks land alongside). Renamed from `parachute-app` 2026-05-27. | committed core |
 | [`parachute-scribe`](./parachute-scribe) | Scribe — transcription worker | committed core |
 | [`parachute-hub`](./parachute-hub) | Hub — the portal on :1939, OAuth issuer, CLI surface (renamed from `parachute-cli` 2026-04-26) | committed core |
 | [`parachute-patterns`](./parachute-patterns) | Cross-cutting conventions (docs-only) | core support |
