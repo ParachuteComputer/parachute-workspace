@@ -27,7 +27,7 @@ cd ~/ParachuteComputer
 # 2. Clone each Parachute module you need
 gh repo clone ParachuteComputer/parachute-hub
 gh repo clone ParachuteComputer/parachute-vault
-gh repo clone ParachuteComputer/parachute-app
+gh repo clone ParachuteComputer/parachute-surface
 gh repo clone ParachuteComputer/parachute-scribe
 gh repo clone ParachuteComputer/parachute-notes
 gh repo clone ParachuteComputer/parachute-patterns
