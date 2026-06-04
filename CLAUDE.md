@@ -2,7 +2,7 @@
 
 The top-level workspace for the Parachute ecosystem. Each Parachute module is its own git repo under this directory; this CLAUDE.md captures workspace-wide practices.
 
-**On entering this directory, read `Current/Parachute` from the parachute-vault MCP.** It's the live state of the ecosystem — what's shipped, what's in flight, what's parked, who's using it.
+**On entering this directory, orient from the team vault: read `Current/Parachute` via the `parachute-parachute` MCP, then check the work board** (`query-notes { tag: "work", metadata: { status: { eq: "in-progress" } } }`) — what's shipped, what's in flight, and **who's working on what right now**. See "Working inside our parachute" below. (No vault access? Skip this — GitHub issues + PRs stand alone.)
 
 ## Committed core vs explorations
 
@@ -16,6 +16,7 @@ The four committed-core modules are the product surface. Two more repos (pattern
 | [`parachute-hub`](./parachute-hub) | Hub — the portal on :1939, OAuth issuer, CLI surface (renamed from `parachute-cli` 2026-04-26) | committed core |
 | [`parachute-patterns`](./parachute-patterns) | Cross-cutting conventions (docs-only) | core support |
 | [`parachute.computer`](./parachute.computer) | Public site + blog | core support |
+| [`parachute-brain`](./parachute-brain) | The team's internal surface over the project vault (parachute-parachute) — live at [parachutecomputer.github.io/parachute-brain](https://parachutecomputer.github.io/parachute-brain/) | internal tooling (merge delegated) |
 | [`parachute-runner`](./parachute-runner) | Runner — vault-as-job-substrate, spawns claude -p against tag:job notes | shipped (Phase 1 complete 2026-05-21); not yet promoted to committed-core |
 | [`parachute-notes`](./parachute-notes) | **ARCHIVING** 2026-05-24 — notes-ui moved to parachute-surface/packages/notes-ui; notes-daemon was already deprecated (see [DEPRECATED.md](./parachute-notes/DEPRECATED.md)) | archiving |
 | [`parachute-channel`](./parachute-channel) | Channel — webhook fan-out | exploration — may retire |
@@ -30,6 +31,19 @@ Anything else in the workspace (`parachute-narrate`, `parachute-daily`, `prism`,
 **Note on `parachute-agent`**: promoted to committed-core 2026-05-05, retired 2026-05-20. The Gitcoin Brain pattern (vault-as-job-substrate, ~200-line Python cron runner spawning `claude -p` with inline MCP config) proved the "Claude in containers" architecture was overengineered for the owner-operated, trusted-vault use case it was built for. The trust-gradient insight (see [`parachute-patterns/patterns/trust-gradient-isolation.md`](./parachute-patterns/patterns/trust-gradient-isolation.md)) informed the decision. [`parachute-runner`](./parachute-runner) is the lightweight successor primitive for owner-operated automation (Phase 1 complete 2026-05-21); `parachute-cloud` (TBD) will handle multi-tenant container isolation when that demand materializes.
 
 **Note on hub's `FIRST_PARTY_FALLBACKS`**: that registry was a *transitional vendored-manifest fallback* (one entry per module that hadn't yet shipped its own `.parachute/module.json`). As of 2026-05-21, vault/scribe/runner self-register via the canonical pattern (see [`parachute-patterns/patterns/module-self-registration.md`](./parachute-patterns/patterns/module-self-registration.md)) and their FALLBACK entries retired. Hub retains `KNOWN_MODULES` (a minimal install-bootstrap registry) for the install-time path. Committed-core status is a commitment statement; hub's manifest registries are implementation details — they're separate axes.
+
+## Working inside our parachute (the team vault)
+
+Parachute development runs on its own Parachute. The **parachute-parachute team vault** (MCP alias `parachute-parachute`; vault `default` at `our.parachute.computer`) is the team brain **and the project-management system**: cross-repo `work` items (the vault is the source of truth for work — GitHub holds code + PRs, not an issue tracker), `decision` records, `meeting` digests with sacred verbatim transcripts, `capture/feedback` → `feedback-theme`, and the `person` roster. Work spans repos via `repo/<slug>` tags, so "everything touching hub" is one query. A weave job digests new captures into `proposal` notes; **AI proposes, humans govern** (the Weave view in parachute-brain).
+
+**The dev ritual** — every session (agent or human) with vault access:
+
+1. **Orient** — read `Current/Parachute` + query in-progress work. Multiple agent sessions share this workspace: check who has claimed a repo **before** working in it, and before restarting shared daemons (hub/vault).
+2. **Claim** — before substantive work, create/update a `work` note: `assignee: <your handle>` (`aaron`, `uni`, …), a `repo/<slug>` tag for every repo you'll touch, `status: in-progress`.
+3. **Log** — append progress, decisions, and surprises to your work note as you go. Meeting transcripts enter via the surface's **+ Add meeting** (paste, or a .txt/.md file).
+4. **Release** — on finishing: `status: in-review` / `shipped` / `dropped`. The weave flags stale claims and repo collisions in the daily sync.
+
+**Without vault access** (outside contributors): none of this is required — the normal GitHub flow stands alone. Today's orientation is the core team building *with* the vault (solo-Aaron first); the eventual multi-user shape keeps each person on their own branch + local instance, sharing this team vault.
 
 ## Working across repos
 
@@ -68,7 +82,7 @@ Why the discipline exists: the Notes-as-app shift caught us out — hub's setup 
 
 Three rules, captured in [`parachute-patterns/patterns/governance.md`](./parachute-patterns/patterns/governance.md):
 
-1. **No auto-merge.** Tentacles open PRs and report; team-lead reviews and writes a verification summary; the human (Aaron) clicks merge — except in repos where team-lead has delegated merge authority (currently `agent`, `vault`, `patterns`). All seven core + core-support repos (vault, notes, scribe, agent, hub, patterns, parachute.computer) have branch protection on `main` enforcing PR-required + no-force-push + no-deletion. Required-review-count is `0` while solo-team; bumps to ≥1 when a second human contributor joins.
+1. **No auto-merge.** Agents open PRs with a mandatory reviewer pass; the human (Aaron) clicks merge — except where merge authority is explicitly delegated (currently only `parachute-brain`, the internal team surface; the shipped-product repos are all treated identically — no delegation, per Aaron 2026-05-25). All seven core + core-support repos (vault, notes, scribe, agent, hub, patterns, parachute.computer) have branch protection on `main` enforcing PR-required + no-force-push + no-deletion. Required-review-count is `0` while solo-team; bumps to ≥1 when a second human contributor joins.
 2. **RC versioning before `@latest`.** Pre-1.0, every code-touching PR bumps the `rc.N` suffix only — keep `0.X.Y` fixed across the chain (`0.5.8-rc.1` → `rc.2` → `rc.3` …). When Aaron explicitly says ready-for-release: drop the `-rc` suffix, ship the same `0.X.Y` stable (same patch number as the rc chain), `npm publish --tag latest`. Doc-only PRs skip rc per the doc-only exemption. Don't fragment a release into many patch bumps mid-validation. The starting `Y` is the next-patch from the prior stable — e.g. after `0.5.7` ships, the next code-touching rc chain runs at `0.5.8-rc.N` → `0.5.8` stable. (Canonical: `parachute-patterns/patterns/governance.md` rule 2.)
 3. **Patterns check in every review.** Each PR review surfaces which patterns the change touches, whether it conforms, whether it establishes / changes a pattern.
 
