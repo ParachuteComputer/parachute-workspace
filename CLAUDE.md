@@ -16,8 +16,8 @@ The four committed-core modules are the product surface. Two more repos (pattern
 | [`parachute-hub`](./parachute-hub) | Hub — the portal on :1939, OAuth issuer, CLI surface (renamed from `parachute-cli` 2026-04-26) | committed core |
 | [`parachute-patterns`](./parachute-patterns) | Cross-cutting conventions (docs-only) | core support |
 | [`parachute.computer`](./parachute.computer) | Public site + blog | core support |
-| [`parachute-brain`](./parachute-brain) | The team's internal surface over the project vault (parachute-parachute) — live at [parachutecomputer.github.io/parachute-brain](https://parachutecomputer.github.io/parachute-brain/) | internal tooling (merge delegated) |
 | [`parachute-runner`](./parachute-runner) | Runner — vault-as-job-substrate, spawns claude -p against tag:job notes | shipped (Phase 1 complete 2026-05-21); not yet promoted to committed-core |
+| [`parachute-brain`](./parachute-brain) | The team's internal surface over the project vault (parachute-parachute) — live at [parachutecomputer.github.io/parachute-brain](https://parachutecomputer.github.io/parachute-brain/) | internal tooling (merge delegated) |
 | [`parachute-notes`](./parachute-notes) | **ARCHIVING** 2026-05-24 — notes-ui moved to parachute-surface/packages/notes-ui; notes-daemon was already deprecated (see [DEPRECATED.md](./parachute-notes/DEPRECATED.md)) | archiving |
 | [`parachute-channel`](./parachute-channel) | Channel — webhook fan-out | exploration — may retire |
 | [`parachute-agent`](./parachute-agent) | Agent — Claude-in-containers (retired 2026-05-20; see [DEPRECATED.md](./parachute-agent/DEPRECATED.md)) | retired |
@@ -39,7 +39,7 @@ Parachute development runs on its own Parachute. The **parachute-parachute team 
 **The dev ritual** — every session (agent or human) with vault access:
 
 1. **Orient** — read `Current/Parachute` + query in-progress work. Multiple agent sessions share this workspace: check who has claimed a repo **before** working in it, and before restarting shared daemons (hub/vault).
-2. **Claim** — before substantive work, create/update a `work` note: `assignee: <your handle>` (`aaron`, `uni`, …), a `repo/<slug>` tag for every repo you'll touch, `status: in-progress`.
+2. **Claim** — before substantive work, create/update a `work` note: `assignee: <your handle>` (`aaron`, `uni`, …), a `repo/<slug>` tag for every repo you'll touch, `status: in-progress`. Find an existing note by scanning the in-progress board or querying the repo's tag (`assignee` is a scan field, not indexed). **Skip the Claim for read-only investigation under ~3 commands** — don't clutter the board.
 3. **Log** — append progress, decisions, and surprises to your work note as you go. Meeting transcripts enter via the surface's **+ Add meeting** (paste, or a .txt/.md file).
 4. **Release** — on finishing: `status: in-review` / `shipped` / `dropped`. The weave flags stale claims and repo collisions in the daily sync.
 
