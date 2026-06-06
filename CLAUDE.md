@@ -2,7 +2,7 @@
 
 The top-level workspace for the Parachute ecosystem. Each Parachute module is its own git repo under this directory; this CLAUDE.md captures workspace-wide practices.
 
-**On entering this directory, orient from the team vault: read `Current/Parachute` via the `parachute-parachute` MCP, then check the work board** (`query-notes { tag: "work", metadata: { status: { eq: "in-progress" } } }`) — what's shipped, what's in flight, and **who's working on what right now**. See "Working inside our parachute" below. (No vault access? Skip this — GitHub issues + PRs stand alone.)
+**On entering this directory, orient from the team vault: read `Current/Parachute` via the `parachute-parachute` MCP, then check the work board** (`query-notes { tag: "work", metadata: { status: { eq: "in-progress" } } }`) — what's shipped and what's in flight. See "Working inside our parachute" below. (No vault access? Skip this — GitHub issues + PRs stand alone.)
 
 ## Committed core vs explorations
 
@@ -36,12 +36,7 @@ Anything else in the workspace (`parachute-narrate`, `parachute-daily`, `prism`,
 
 Parachute development runs on its own Parachute. The **parachute-parachute team vault** (MCP alias `parachute-parachute`; vault `default` at `our.parachute.computer`) is the team brain **and the project-management system**: cross-repo `work` items (the vault is the source of truth for work — GitHub holds code + PRs, not an issue tracker), `decision` records, `meeting` digests with sacred verbatim transcripts, `capture/feedback` → `feedback-theme`, and the `person` roster. Work spans repos via `repo/<slug>` tags, so "everything touching hub" is one query. A weave job digests new captures into `proposal` notes; **AI proposes, humans govern** (the Weave view in parachute-brain).
 
-**The dev ritual** — every session (agent or human) with vault access:
-
-1. **Orient** — read `Current/Parachute` + query in-progress work. Multiple agent sessions share this workspace: check who has claimed a repo **before** working in it, and before restarting shared daemons (hub/vault).
-2. **Claim** — before substantive work, create/update a `work` note: `assignee: <your handle>` (`aaron`, `uni`, …), a `repo/<slug>` tag for every repo you'll touch, `status: in-progress`. Find an existing note by scanning the in-progress board or querying the repo's tag (`assignee` is a scan field, not indexed). **Skip the Claim for read-only investigation under ~3 commands** — don't clutter the board.
-3. **Log** — append progress, decisions, and surprises to your work note as you go. Meeting transcripts enter via the surface's **+ Add meeting** (paste, or a .txt/.md file).
-4. **Release** — on finishing: `status: in-review` / `shipped` / `dropped`. The weave flags stale claims and repo collisions in the daily sync.
+**The board tracks human-level arcs, not agent tasks** (settled 2026-06-06). A `work` note is a project-level thread a human would name — "the internal surface," "hub-as-supervisor unification" — not an individual fix or PR. Don't create a work note to claim a small fix; let it ride inside its arc's log, and let PR history hold the detail. Orient by reading `Current/Parachute` + the board, log meaningful progress on the arc you're advancing, and keep statuses honest (`in-progress` / `shipped` / `dropped`). Meeting transcripts enter via the surface's **+ Add meeting** (paste, or a .txt/.md file). Multiple agent sessions still share this workspace — coordinate before restarting shared daemons (hub/vault), but coordination happens in conversation, not via board claims.
 
 **Without vault access** (outside contributors): none of this is required — the normal GitHub flow stands alone. Today's orientation is the core team building *with* the vault (solo-Aaron first); the eventual multi-user shape keeps each person on their own branch + local instance, sharing this team vault.
 
