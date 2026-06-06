@@ -39,7 +39,7 @@ gh repo clone ParachuteComputer/parachute-channel
 # ... others as needed
 ```
 
-The committed-core line is documented in `CLAUDE.md`. As of 2026-05-22: **vault, app, scribe, hub** are the four committed-core modules.
+The committed-core line is documented in `CLAUDE.md`. As of 2026-05-27: **vault, surface, scribe, hub** are the four committed-core modules (surface renamed from app 2026-05-27).
 
 ## Workspace-level patterns + audit tooling
 
