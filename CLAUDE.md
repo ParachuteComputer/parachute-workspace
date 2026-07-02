@@ -39,8 +39,10 @@ Parachute development runs on its own Parachute. The **parachute-parachute team 
 
 1. **Orient** — read `Current/Parachute` + query in-progress work. Multiple agent sessions share this workspace: check who has claimed a repo **before** working in it, and before restarting shared daemons (hub/vault).
 2. **Claim** — before substantive work, create/update a `work` note: `assignee: <your handle>` (`aaron`, `uni`, …), a `repo/<slug>` tag for every repo you'll touch, `status: in-progress`. Find an existing note by scanning the in-progress board or querying the repo's tag (`assignee` is a scan field, not indexed). **Skip the Claim for read-only investigation under ~3 commands** — don't clutter the board.
-3. **Log** — append progress, decisions, and surprises to your work note as you go. Meeting transcripts enter via the surface's **+ Add meeting** (paste, or a .txt/.md file).
+3. **Log** — append progress, decisions, and surprises to your work note as you go. **Sessions are the new meetings** (settled 2026-07-01): a decision Aaron makes in-session gets a `Decisions/<date>-<slug>` note in the same session; direction-setting gets a `Strategy/` note. Don't leave `DESIGN-*`/`STRATEGY-*` files at the workspace root — the vault is the brain (`Decisions/` and `Strategy/` are established vault territories; the ~11 pre-existing root files are grandfathered backlog, tracked for reconciliation in the team vault's `Work/brain-workflow-hardening`). Meeting transcripts enter via the surface's **+ Add meeting** (paste, or a .txt/.md file).
 4. **Release** — on finishing: `status: in-review` / `shipped` / `dropped`. The weave flags stale claims and repo collisions in the daily sync.
+
+**The GitHub-issues boundary** (settled 2026-07-01): an arc a human would name lives in the vault (`work`); a fix a PR will close within days lives in a GitHub issue; the vault note's `gh_links` points down at issues/PRs, never syncs status. File-level side-discoveries during a PR stay `gh issue create` material; anything arc-shaped goes on the board.
 
 **Without vault access** (outside contributors): none of this is required — the normal GitHub flow stands alone. Today's orientation is the core team building *with* the vault (solo-Aaron first); the eventual multi-user shape keeps each person on their own branch + local instance, sharing this team vault.
 
