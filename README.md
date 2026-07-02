@@ -32,7 +32,7 @@ gh repo clone ParachuteComputer/parachute-scribe
 gh repo clone ParachuteComputer/parachute-notes   # archiving — notes-ui moved into parachute-surface; clone only for history
 gh repo clone ParachuteComputer/parachute-patterns
 gh repo clone ParachuteComputer/parachute.computer
-gh repo clone ParachuteComputer/parachute-runner
+gh repo clone ParachuteComputer/parachute-runner  # RETIRED 2026-07-01 — clone only for history
 
 # 3. (Optional) Clone explorations
 gh repo clone ParachuteComputer/parachute-agent
