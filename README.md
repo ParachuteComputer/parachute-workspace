@@ -35,7 +35,7 @@ gh repo clone ParachuteComputer/parachute.computer
 gh repo clone ParachuteComputer/parachute-runner
 
 # 3. (Optional) Clone explorations
-gh repo clone ParachuteComputer/parachute-channel
+gh repo clone ParachuteComputer/parachute-agent
 # ... others as needed
 ```
 
