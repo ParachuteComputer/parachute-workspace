@@ -14,12 +14,17 @@
 !CLAUDE.md
 !README.md
 
-# ── Allowlist: workspace docs (historical + session) ──
-# Move historical workspace-root artifacts (DESIGN-*, BETA-EMAIL-*,
-# BLOG-OUTLINE-*, RELEASE-NOTES-*, WAKE-UP-*, etc.) into docs/ if you
-# want them tracked. Until then, leave them ignored.
+# ── Allowlist: workspace docs ──
 !docs/
 !docs/**
+
+# ── Within docs/: the historical bin stays LOCAL-ONLY ──
+# docs/historical/ holds pre-vault-era root artifacts (DESIGN-*, HANDOFF-*,
+# client notes, launch docs) that were never committed — this repo is PUBLIC,
+# and they contain private/internal material. Only the README (which explains
+# the bin) is tracked. Mine them into the team vault, don't publish them.
+docs/historical/*
+!docs/historical/README.md
 
 # ── Allowlist: scratch session notes ──
 # Handoffs, process audits, thinking docs. Tracked because they're

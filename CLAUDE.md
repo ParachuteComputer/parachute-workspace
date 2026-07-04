@@ -1,134 +1,44 @@
-# Parachute Computer
+# Parachute Computer — the workspace
 
-The top-level workspace for the Parachute ecosystem. Each Parachute module is its own git repo under this directory; this CLAUDE.md captures workspace-wide practices.
+The dev substrate for the Parachute ecosystem. Each module repo is its own git repo cloned under this directory; this repo carries the workspace-wide practices — this file, `docs/`, and `.claude/` (agents + skills).
 
-**On entering this directory, orient from the team vault: read `Current/Parachute` via the `parachute-parachute` MCP, then check the work board** (`query-notes { tag: "work", metadata: { status: { eq: "in-progress" } } }`) — what's shipped, what's in flight, and **who's working on what right now**. See "Working inside our parachute" below. (No vault access? Skip this — GitHub issues + PRs stand alone.)
+**The frame: three layers, two doors, one contract.** The product is the trinity — **Vault → Surface → Agent** (deepen L1, gradual L2, experimental L3) — delivered through two doors: **Hub** (self-hosted) and **Cloud** (hosted), both speaking one wire contract (REST/MCP/OAuth/portable-md). Canonical: the team vault's `Canon/Modules` (registry of record) + `Reference/Architecture` (the one-page map); ratified in `Decisions/2026-07-03-three-layers-two-doors-one-contract`.
 
-## Committed core vs explorations
+## On entering — orient
 
-The four committed-core modules are the product surface. Two more repos (patterns, site) exist to support them but aren't themselves modules.
+Read `Current/Parachute` via the `parachute-parachute` MCP, then the work board (`query-notes { tag: "work", metadata: { status: { eq: "in-progress" } } }`) — what's shipped, what's in flight, and **who's working where right now** (multiple sessions share this workspace). **No vault access?** Skip this — GitHub issues + PRs stand alone.
 
-| Repo | Role | Status |
-|---|---|---|
-| [`parachute-vault`](./parachute-vault) | Vault — knowledge graph + MCP | committed core |
-| [`parachute-surface`](./parachute-surface) | Surface — UI host module + bundled reference surfaces (notes-ui moved here 2026-05-24; future surfaces like calendar / tasks land alongside). Renamed from `parachute-app` 2026-05-27. | committed core |
-| [`parachute-scribe`](./parachute-scribe) | Scribe — transcription worker | committed core |
-| [`parachute-hub`](./parachute-hub) | Hub — the portal on :1939, OAuth issuer, CLI surface (renamed from `parachute-cli` 2026-04-26) | committed core |
-| [`parachute-patterns`](./parachute-patterns) | Cross-cutting conventions (docs-only) | core support |
-| [`parachute.computer`](./parachute.computer) | Public site + blog | core support |
-| [`parachute-runner`](./parachute-runner) | Runner — vault-as-job-substrate, spawns claude -p against tag:job notes | **RETIRED 2026-07-01** (Aaron's call; superseded by agent's `#agent/job` scheduler — see [migration](./parachute-patterns/migrations/2026-07-01-runner-retirement.md); hub#733 removed it from install/offer surfaces) |
-| [`parachute-brain`](./parachute-brain) | The team's internal surface over the project vault (parachute-parachute) — live at [parachutecomputer.github.io/parachute-brain](https://parachutecomputer.github.io/parachute-brain/) | internal tooling (merge delegated) |
-| [`parachute-notes`](./parachute-notes) | **ARCHIVING** 2026-05-24 — notes-ui moved to parachute-surface/packages/notes-ui; notes-daemon was already deprecated (see [DEPRECATED.md](./parachute-notes/DEPRECATED.md)) | archiving |
-| [`parachute-agent`](./parachute-agent) | Agent — vault-native agents: a `#agent/definition` note → inbound message becomes a sandboxed `claude -p` turn → reply written back as a note; messaging gateway on :1941 (Telegram today). **Renamed from `parachute-channel` 2026-06-17** (see [migration](./parachute-patterns/migrations/2026-06-17-channel-to-agent.md)). | exploration — experimental preview |
+## The repos (one line each — `Canon/Modules` in the team vault is the registry of record)
 
-Anything else in the workspace (`parachute-narrate`, `parachute-daily`, `prism`, `tailshare`, `parachute-octopus`, etc.) is exploration, archive, or unrelated. The committed-core line was redrawn 2026-05-22 (vault/surface/scribe/hub) when Notes-as-daemon migrated to Notes-as-app inside parachute-surface — features, marketing, and pattern docs name the four committed-core modules; everything else lives but isn't promoted.
+| Repo | Role |
+|---|---|
+| [`parachute-vault`](./parachute-vault) | **L1 Vault** — knowledge graph + MCP/REST; transcription folding in (scribe-fold); owns its domain across both doors |
+| [`parachute-surface`](./parachute-surface) | **L2 Surface** — UI host + reference surfaces (Notes) + surface SDK + build-on-push |
+| [`parachute-agent`](./parachute-agent) | **L3 Agent** — vault-native agents + messaging gateway (:1941); experimental preview |
+| [`parachute-hub`](./parachute-hub) | **Door: self-hosted** — OAuth issuer, catalog, CLI, supervisor (:1939) |
+| [`parachute-cloud`](./parachute-cloud) | **Door: hosted** — identity worker + control plane + billing (Cloudflare Workers/D1/DO/R2) |
+| [`parachute.computer`](./parachute.computer) | Public site + blog; teaches the ladder |
+| [`parachute-brain`](./parachute-brain) | Internal team surface over the project vault (merge delegated) |
+| [`parachute-scribe`](./parachute-scribe) | Folding into Vault (ratified 2026-07-03); archives at fold Phase 3 |
+| [`parachute-patterns`](./parachute-patterns) | **ARCHIVING** (`Decisions/2026-07-03-patterns-archive`) — audit-driven rescue PR, then GitHub-archive |
+| everything else | exploration (`parachute-pebble` = L1 capture client, active side project) or graveyard — see `Canon/Modules` |
 
-**Note on `parachute-notes` migration (2026-05-21 → 2026-05-24)**: the notes-daemon shipped as committed-core through launch (2026-04-23), but Notes-as-UI was always conceptually an "app that consumes a vault," not a backend service. Once parachute-surface shipped (2026-05-21) with auto-bootstrap of `@openparachute/notes-ui`, notes-daemon's role collapsed to "static-serve wrapper." The 4-phase deprecation arc lives in [the parachute-surface design doc §16](./parachute.computer/design/2026-05-21-parachute-surface-design.md). Operators on legacy notes-daemon installs continue to work; hub redirects `/notes/*` → `/surface/notes/*` for backwards compat. Port 1942 reclaims at Phase 3.
+**Compatibility labels** (the old "committed-core" axis): vault + surface-client/surface-render have real users — keep compatible; hub + cloud are the shipped doors — standard care, migrations for operator-visible changes; agent, surface-host near-zero — breaking OK; scribe frozen (folding into vault).
 
-**Note on `parachute-notes` archive (2026-05-24)**: notes-ui moved into parachute-surface/packages/notes-ui to consolidate "host module + bundled reference apps" in one repo. After the notes-daemon deprecation, notes-ui was the only active package in parachute-notes — single-package repo for a "reference app" is architecturally awkward. The npm package `@openparachute/notes-ui` is unchanged; only the source repo moved. parachute-notes carries top-level [DEPRECATED.md](./parachute-notes/DEPRECATED.md); the repo will be archived once the dust settles. Future reference apps (calendar, tasks, etc.) will land as `packages/<app>` in parachute-surface following the same pattern.
+## The dev ritual (with vault access)
 
-**Note on `parachute-agent` (live module) vs the retired containers agent**: the live [`parachute-agent`](./parachute-agent) repo is the **renamed `parachute-channel`** module — vault-native agents + the messaging gateway on :1941, renamed 2026-06-17 ([migration](./parachute-patterns/migrations/2026-06-17-channel-to-agent.md)). It ships as an **experimental preview** (not committed-core); `@openparachute/agent` on npm publishes for real via tag-triggered CI (stable `0.2.4` shipped 2026-07-01 — the old "deprecated prior build" collision is resolved); local dev still runs **bun-linked** from the checkout. **Name-collision caveat:** the *earlier* "Claude-in-containers" agent (promoted to committed-core 2026-05-05, retired 2026-05-20) was the separate **`paraclaw`** repo, NOT this one. That retirement: the Gitcoin Brain pattern (vault-as-job-substrate, ~200-line Python cron runner spawning `claude -p` with inline MCP config) proved the "Claude in containers" architecture was overengineered for the owner-operated, trusted-vault use case it was built for (trust-gradient insight, see [`parachute-patterns/patterns/trust-gradient-isolation.md`](./parachute-patterns/patterns/trust-gradient-isolation.md)). [`parachute-runner`](./parachute-runner) was the lightweight successor primitive for owner-operated automation (Phase 1 complete 2026-05-21) until the agent module's vault-native `#agent/job` scheduler superseded it — **runner retired 2026-07-01**; `parachute-cloud` (TBD) will handle multi-tenant container isolation when that demand materializes.
+**Orient → Claim → Log → Release.** Before substantive work, claim a `work` note (assignee, `repo/<slug>` tag per repo touched, `status: in-progress`); log progress and surprises as you go; decisions made in-session get a `Decisions/<date>-<slug>` note in the same session (**sessions are the new meetings**); release with `status: in-review|shipped|dropped`. Read-only investigations under ~3 commands skip the Claim. **The vault is the brain — no loose design/strategy files at the workspace root** (historical ones live in `docs/historical/`). Detail + the GitHub-issues boundary: [docs/process/development.md](./docs/process/development.md).
 
-**Note on hub's `FIRST_PARTY_FALLBACKS`**: that registry was a *transitional vendored-manifest fallback* (one entry per module that hadn't yet shipped its own `.parachute/module.json`). As of 2026-05-21, vault/scribe/runner self-register via the canonical pattern (see [`parachute-patterns/patterns/module-self-registration.md`](./parachute-patterns/patterns/module-self-registration.md)) and their FALLBACK entries retired. Hub retains `KNOWN_MODULES` (a minimal install-bootstrap registry) for the install-time path. Committed-core status is a commitment statement; hub's manifest registries are implementation details — they're separate axes.
+## Working across repos — the TL;DR
 
-## Working inside our parachute (the team vault)
+The main thread **orchestrates**; blocking subagents execute. `cd` into the target repo before dispatch (or brief the agent to cd first — otherwise it reads this file instead of the repo's CLAUDE.md). One PR at a time per repo; single dev branch `ag-unforced-dev`; branch first, then edit. **Verify subagent claims against ground truth** (`git show`, `gh pr diff`) before acting — especially negative findings and anything that reverses committed work. **Every PR gets an independent reviewer (foreground) before merge**; specialists in [.claude/skills/review-subagents/](./.claude/skills/review-subagents/SKILL.md) run when the diff touches their domain. Full discipline: [docs/process/orchestration.md](./docs/process/orchestration.md).
 
-Parachute development runs on its own Parachute. The **parachute-parachute team vault** (MCP alias `parachute-parachute`; vault `default` at `our.parachute.computer`) is the team brain **and the project-management system**: cross-repo `work` items (the vault is the source of truth for work — GitHub holds code + PRs, not an issue tracker), `decision` records, `meeting` digests with sacred verbatim transcripts, `capture/feedback` → `feedback-theme`, and the `person` roster. Work spans repos via `repo/<slug>` tags, so "everything touching hub" is one query. A weave job digests new captures into `proposal` notes; **AI proposes, humans govern** (the Weave view in parachute-brain).
+## Governance (one breath)
 
-**The dev ritual** — every session (agent or human) with vault access:
+No auto-merge — Aaron merges (brain excepted) · every code-touching PR bumps `rc.N`, tag pushed on merge, CI publishes · a contracts check rides every review · architectural shifts ship a migration file. Full rules: [docs/process/governance.md](./docs/process/governance.md).
 
-1. **Orient** — read `Current/Parachute` + query in-progress work. Multiple agent sessions share this workspace: check who has claimed a repo **before** working in it, and before restarting shared daemons (hub/vault).
-2. **Claim** — before substantive work, create/update a `work` note: `assignee: <your handle>` (`aaron`, `uni`, …), a `repo/<slug>` tag for every repo you'll touch, `status: in-progress`. Find an existing note by scanning the in-progress board or querying the repo's tag (`assignee` is a scan field, not indexed). **Skip the Claim for read-only investigation under ~3 commands** — don't clutter the board.
-3. **Log** — append progress, decisions, and surprises to your work note as you go. **Sessions are the new meetings** (settled 2026-07-01): a decision Aaron makes in-session gets a `Decisions/<date>-<slug>` note in the same session; direction-setting gets a `Strategy/` note. Don't leave `DESIGN-*`/`STRATEGY-*` files at the workspace root — the vault is the brain (`Decisions/` and `Strategy/` are established vault territories; the ~11 pre-existing root files are grandfathered backlog, tracked for reconciliation in the team vault's `Work/brain-workflow-hardening`). Meeting transcripts enter via the surface's **+ Add meeting** (paste, or a .txt/.md file).
-4. **Release** — on finishing: `status: in-review` / `shipped` / `dropped`. The weave flags stale claims and repo collisions in the daily sync.
+## Local dev
 
-**The GitHub-issues boundary** (settled 2026-07-01): an arc a human would name lives in the vault (`work`); a fix a PR will close within days lives in a GitHub issue; the vault note's `gh_links` points down at issues/PRs, never syncs status. File-level side-discoveries during a PR stay `gh issue create` material; anything arc-shaped goes on the board.
+Modules run **bun-linked** from checkouts — `parachute start <svc>` follows the checked-out branch (short service names: `restart surface`, not `restart parachute-surface`). After merging a frontend bump: `bun run build` in the repo, then `parachute restart <svc>`. Post-merge sync: `git fetch && git pull --ff-only` in affected repos (skip repos with uncommitted work); pull `main` before starting any new work.
 
-**Without vault access** (outside contributors): none of this is required — the normal GitHub flow stands alone. Today's orientation is the core team building *with* the vault (solo-Aaron first); the eventual multi-user shape keeps each person on their own branch + local instance, sharing this team vault.
-
-## Working across repos
-
-The main thread is the **orchestrator**, not the executor. Substantial code-shipping work goes to blocking subagents; the orchestrator coordinates streams, verifies outputs, and keeps its context clean of execution detail.
-
-**Dispatch model.** Default to blocking subagents (`Agent({ subagent_type: "general-purpose" })` or a specialized agent — see the available list in CLAUDE Code's docs). Spawn, do focused work, return result, terminate. For cross-repo work, dispatch one subagent per repo concurrently in a single tool call so they run in parallel. Use `run_in_background: true` sparingly — only when work is genuinely long-running and there's unrelated work in the meantime. The persistent team/tentacle apparatus (`subagent_type: "tentacle"` + `TeamCreate` + `SendMessage`) exists but has been fragile here (slot-squatting after restart, `isActive: null` is not a death signal, `/resume` kills them, working-tree collisions when a one-shot races a persistent agent). Reach for it only when there's genuinely multi-round iteration too expensive to re-brief.
-
-**When to do it yourself instead.** One-line edits with full context already loaded; read-only investigations under ~3 commands; memory writes; final review of someone else's commits before merge. The dispatch overhead beats the value for trivial work.
-
-**Per-repo discipline.**
-1. **One PR at a time per repo.** Finish through merge before starting the next. Side-discoveries → `gh issue create`, not parallel branches.
-2. **Single branch `ag-unforced-dev`.** Two branches per repo only — `main` + `ag-unforced-dev`. Subagents work on the dev branch, PR to main, reset to track main after merge. No per-feature branches.
-3. **`cd` into the target repo before dispatch.** Subagents inherit cwd from the parent's initial shell, NOT the current Bash cwd after a `cd` command. Without a `cd` first, the subagent reads the workspace `CLAUDE.md` instead of the repo `CLAUDE.md` and may silently claim an unrelated workspace task.
-
-**Briefing.** Provide discoverable context (branch head sha, open PR number, landmarks). Spell out verifiable success criteria ("bump to rc.N+1, commit, push, open PR with this body, exit"). Don't assume the subagent shares the orchestrator's in-memory model of repo state.
-
-**Verify subagent outputs before acting.** Treat claims as inputs to verify, not facts. Especially **negative findings** ("I don't see X") and **reversal-of-committed-work** actions (cancelling a fold, reverting a commit, force-pushing). Run `git show <sha>:<path>` or `gh pr diff <num>` to confirm — agents may be reading a stale working tree. Cost asymmetry: verification is one command; acting on a false negative costs a reverted commit and lost trust.
-
-**Reviewer dispatch is mandatory.** Every PR gets a reviewer subagent before merge — even doc-only ones.
-
-**Session boundary.** Subagents don't survive `/resume`. Bridge sessions with `/handoff` — capture in-flight state in a doc the fresh session can read.
-
-## When making architectural shifts
-
-When a PR decides an architectural shift — committed-core changes, canonical install path changes, a doc statement that's quoted across the workspace changes — ship a `parachute-patterns/migrations/YYYY-MM-DD-<slug>.md` file in the same PR.
-
-The file is a propagation checklist. It lists every code/doc location that needs updating + tracks which PRs landed each item. Future contributors see "is this shift fully propagated?" at a glance.
-
-See [`parachute-patterns/migrations/README.md`](./parachute-patterns/migrations/README.md) for the discipline + format. The [2026-05-21 Notes-as-app migration](./parachute-patterns/migrations/2026-05-21-notes-as-app.md) is the canonical example (retroactive — written after the shift to seed the discipline).
-
-Run [`parachute-patterns/scripts/audit-canonical-refs.sh`](./parachute-patterns/scripts/audit-canonical-refs.sh) after shifts (or before releases) to catch missed propagations.
-
-Why the discipline exists: the Notes-as-app shift caught us out — hub's setup wizard hardcoded "install Notes" as the canonical first install even after the architecture had moved to "install App which auto-bootstraps notes-ui." An audit then found ~9 more stale references. A migration file in the originating PR would have made the propagation work obvious.
-
-## Governance (settled 2026-04-25)
-
-Three rules, captured in [`parachute-patterns/patterns/governance.md`](./parachute-patterns/patterns/governance.md):
-
-1. **No auto-merge.** Agents open PRs with a mandatory reviewer pass; the human (Aaron) clicks merge — except where merge authority is explicitly delegated (currently only `parachute-brain`, the internal team surface; the shipped-product repos are all treated identically — no delegation, per Aaron 2026-05-25). All seven core + core-support repos (vault, notes, scribe, agent, hub, patterns, parachute.computer) have branch protection on `main` enforcing PR-required + no-force-push + no-deletion. Required-review-count is `0` while solo-team; bumps to ≥1 when a second human contributor joins.
-2. **RC versioning before `@latest`.** Pre-1.0, every code-touching PR bumps the `rc.N` suffix only — keep `0.X.Y` fixed across the chain (`0.5.8-rc.1` → `rc.2` → `rc.3` …). When Aaron explicitly says ready-for-release: drop the `-rc` suffix, ship the same `0.X.Y` stable (same patch number as the rc chain), `npm publish --tag latest`. Doc-only PRs skip rc per the doc-only exemption. Don't fragment a release into many patch bumps mid-validation. The starting `Y` is the next-patch from the prior stable — e.g. after `0.5.7` ships, the next code-touching rc chain runs at `0.5.8-rc.N` → `0.5.8` stable. (Canonical: `parachute-patterns/patterns/governance.md` rule 2.)
-3. **Patterns check in every review.** Each PR review surfaces which patterns the change touches, whether it conforms, whether it establishes / changes a pattern.
-
-## Cross-cutting conventions
-
-[`parachute-patterns/`](./parachute-patterns) is the single source of truth for ecosystem-wide conventions: naming, brand, schemas, OAuth scopes, module protocol, ports, governance. Before shipping code that crosses a pattern boundary, check the relevant file there. If the convention is wrong, update the pattern in that repo first, then adopt downstream.
-
-## Local development setup
-
-All committed-core modules run via `bun link` from the local checkout — that way `parachute start <svc>` follows whatever branch is checked out, not a published npm version. Current links:
-
-- `@openparachute/vault` → `parachute-vault`
-- `@openparachute/notes` → `parachute-notes`
-- `@openparachute/scribe` → `parachute-scribe`
-- `@openparachute/agent` → `parachute-agent`
-- `@openparachute/hub` → `parachute-hub`
-
-After merging a PR that bumps a frontend module (e.g. notes), the running daemon serves the new code on restart only if the build artifact is fresh — `bun run build` in the repo before `parachute restart <svc>`. Hub's `~/.parachute/services.json` caches the version string per service; `parachute upgrade <svc>` refreshes most fields but doesn't always refresh the cached version on the bun-linked path (hub#243 tracks). If `parachute status` shows a stale version while the bundle is current, manually update `services.json` or wait for that hub fix.
-
-## Post-merge sync
-
-Practice (simple version, settled 2026-04-25):
-
-1. Aaron tells the team-lead when he merges PRs.
-2. Team-lead syncs the affected repos with `git fetch && git pull --ff-only`. Skip repos with uncommitted work on a feature branch — don't clobber WIP.
-3. Pull `main` as the first step before starting any new work — every subagent, every dispatch.
-
-The full pattern is in [`parachute-patterns/patterns/post-merge-hygiene.md`](./parachute-patterns/patterns/post-merge-hygiene.md).
-
-## Key design docs
-
-Current-era architecture docs in [`parachute.computer/design/`](./parachute.computer/design):
-
-- `2026-04-20-module-architecture.md` — module protocol (info / config / services.json / well-known)
-- `2026-04-20-hub-as-portal-oauth-and-service-catalog.md` — OAuth architecture (hub as issuer)
-- `2026-04-20-cloud-offering-sketch.md` — cloud deployment shape
-
-## Launch artifacts (historical)
-
-Launch was 2026-04-23. The following files in this workspace root are historical reference:
-
-- `RELEASE-NOTES-launch-day.md` — per-package GitHub Release body drafts
-- `BETA-EMAIL-launch-day.md` — beta user email draft
-- `WAKE-UP-SUMMARY.md` — mid-session state snapshot from launch week
-
-The blog post is live at [`parachute.computer/blog/parachute-is-here/`](./parachute.computer/blog/2026-04-23-parachute-is-here.md). Smoke scripts are in their per-repo locations: `parachute-hub/LAUNCH_SMOKE.md`, `parachute-notes/MOBILE_SMOKE.md`.
-
----
+@docs/index.md
