@@ -23,7 +23,7 @@ Read `Current/Parachute` via the `parachute-parachute` MCP, then the work board 
 | [`parachute-patterns`](./parachute-patterns) | **ARCHIVING** (`Decisions/2026-07-03-patterns-archive`) — audit-driven rescue PR, then GitHub-archive |
 | everything else | exploration (`parachute-pebble` = L1 capture client, active side project) or graveyard — see `Canon/Modules` |
 
-**Compatibility labels** (the old "committed-core" axis): vault + surface-client/surface-render have real users — keep compatible; agent, surface-host near-zero — breaking OK.
+**Compatibility labels** (the old "committed-core" axis): vault + surface-client/surface-render have real users — keep compatible; hub + cloud are the shipped doors — standard care, migrations for operator-visible changes; agent, surface-host near-zero — breaking OK; scribe frozen (folding into vault).
 
 ## The dev ritual (with vault access)
 

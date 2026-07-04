@@ -12,15 +12,19 @@
 #   2. If package.json changed, the lockfile must have changed with it (frozen-lockfile is
 #      CI-only; a version/dep bump without a lockfile sync breaks CI). Repos with gitignored
 #      lockfiles pass automatically.
-#   3. Version must move FORWARD (no accidental downgrade / duplicate rc).
+#   3. Version must not be UNCHANGED when a bump-shaped diff touched package.json.
+#      (Ordering regressions — rc.3 → rc.2 — are the reviewer's eyeball, not this script's.)
 set -euo pipefail
+
+# Module repos only — the workspace and docs-only repos have nothing to version-check.
+[ -f package.json ] || { echo "OK: no package.json here — not a module repo, nothing to check"; exit 0; }
 
 git fetch origin main --quiet 2>/dev/null || true
 BASE="origin/main"
 CHANGED=$(git diff --name-only "$BASE"...HEAD)
 [ -z "$CHANGED" ] && { echo "OK: no changes vs $BASE"; exit 0; }
 
-code_changed=$(echo "$CHANGED" | grep -vE '\.(md|txt)$|^docs/|^\.github/|^LICENSE' || true)
+code_changed=$(echo "$CHANGED" | grep -vE '\.(md|txt)$|^docs/|^\.github/|^LICENSE|^\.gitignore$|^\.claude/' || true)
 pkg_changed=$(echo "$CHANGED" | grep -cx 'package.json' || true)
 lock_changed=$(echo "$CHANGED" | grep -cE '^(bun\.lock|bun\.lockb|package-lock\.json)$' || true)
 

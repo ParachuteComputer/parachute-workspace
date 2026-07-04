@@ -13,6 +13,20 @@ Parachute development runs on its own Parachute. The **parachute-parachute team 
 
 An arc a human would name lives in the vault (`work`); a fix a PR will close within days lives in a GitHub issue; the vault note's `gh_links` points down at issues/PRs, never syncs status. File-level side-discoveries during a PR stay `gh issue create` material; anything arc-shaped goes on the board.
 
+## Local dev details (the bun-link setup)
+
+The module ↔ package links on a dev box (so `parachute start <svc>` follows the checked-out branch, not npm):
+
+| npm package | repo |
+|---|---|
+| `@openparachute/vault` | `parachute-vault` |
+| `@openparachute/hub` | `parachute-hub` |
+| `@openparachute/agent` | `parachute-agent` |
+| `@openparachute/scribe` | `parachute-scribe` (frozen — folding into vault) |
+| `@openparachute/notes` | `parachute-notes` (archived) |
+
+Known gotcha (hub#243): hub's `~/.parachute/services.json` caches the version string per service, and `parachute upgrade <svc>` doesn't always refresh it on the bun-linked path — if `parachute status` shows a stale version while the bundle is current, that's why; update `services.json` manually or wait for the hub fix.
+
 ## Without vault access (outside contributors)
 
 None of this is required — the normal GitHub flow (issues, PRs, reviews) stands alone. Each repo's own CLAUDE.md + docs carry what you need to work in it.
