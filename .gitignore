@@ -26,6 +26,11 @@
 docs/historical/*
 !docs/historical/README.md
 
+# ── Allowlist: workspace-wide tooling ──
+# audit-canonical-refs.sh etc. — moved here from parachute-patterns (2026-07-04).
+!scripts/
+!scripts/**
+
 # ── Allowlist: scratch session notes ──
 # Handoffs, process audits, thinking docs. Tracked because they're
 # knowledge about how we work, not ephemeral state.
