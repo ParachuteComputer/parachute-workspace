@@ -19,11 +19,11 @@ Read `Current/Parachute` via the `parachute-parachute` MCP, then the work board 
 | [`parachute-cloud`](./parachute-cloud) | **Door: hosted** — identity worker + control plane + billing (Cloudflare Workers/D1/DO/R2) |
 | [`parachute.computer`](./parachute.computer) | Public site + blog; teaches the ladder |
 | [`parachute-brain`](./parachute-brain) | Internal team surface over the project vault (merge delegated) |
-| [`parachute-scribe`](./parachute-scribe) | Folding into Vault (ratified 2026-07-03) |
+| [`parachute-scribe`](./parachute-scribe) | **DEPRECATED** |
 | [`parachute-patterns`](./parachute-patterns) | **ARCHIVING** (`Decisions/2026-07-03-patterns-archive`) |
 | everything else | exploration (`parachute-pebble` = L1 capture client, active side project) or graveyard — see `Canon/Modules` |
 
-**Compatibility labels** (the old "committed-core" axis): vault + surface-client/surface-render have real users — keep compatible; hub + cloud are the shipped doors — standard care, migrations for operator-visible changes; agent, surface-host near-zero — breaking OK; scribe frozen (folding into vault).
+**Compatibility labels** (the old "committed-core" axis): vault + surface-client/surface-render have real users — keep compatible; hub + cloud are the shipped doors — standard care, migrations for operator-visible changes; agent, surface-host near-zero — breaking OK; scribe deprecated.
 
 ## Process — the gotchas (the linked docs own the detail)
 
