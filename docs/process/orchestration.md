@@ -4,7 +4,7 @@ The main thread is the **orchestrator**, not the executor. Substantial code-ship
 
 ## Dispatch model
 
-Default to blocking subagents (`Agent({ subagent_type: "general-purpose" })`, or `reviewer` for reviews). Spawn, do focused work, return result, terminate. For cross-repo work, dispatch one subagent per repo concurrently in a single tool call. Use `run_in_background: true` for genuinely long-running work with unrelated work in the meantime. The persistent team/tentacle apparatus exists but has been fragile (slot-squatting after restart, `/resume` kills them, working-tree collisions) — reach for it only for genuinely multi-round iteration too expensive to re-brief.
+Default to blocking subagents (`Agent({ subagent_type: "general-purpose" })`). Spawn, do focused work, return result, terminate. For cross-repo work, dispatch one subagent per repo concurrently in a single tool call. Use `run_in_background: true` for genuinely long-running work with unrelated work in the meantime.
 
 **Do it yourself instead when:** one-line edits with full context loaded; read-only investigations under ~3 commands; memory/vault writes; final review of commits before merge.
 
@@ -28,8 +28,8 @@ Treat claims as inputs to verify, not facts — especially **negative findings**
 
 ## The reviewer gate
 
-**Every PR gets an independent reviewer before merge — even doc-only ones.** Dispatch the reviewer **foreground/blocking** (background reviewers starve behind long builders). General-purpose builders can't dispatch reviewers recursively — the orchestrator dispatches the reviewer after the builder returns. Specialist reviews (wire-contract congruence, auth-and-scope) run per `.claude/skills/review-subagents/SKILL.md` when the diff touches their domain. Security findings are briefed and reported as "location, issue, one-line fix" — extended exploit narratives kill sessions.
+**Every PR gets an independent reviewer before merge — even doc-only ones.** The reviewer is a `general-purpose` subagent with an inline reviewer brief — there is no dedicated reviewer agent type. Briefing, cadence (foreground, delta verdicts, serial per repo), and the specialist roster live in [.claude/skills/review-subagents/SKILL.md](../../.claude/skills/review-subagents/SKILL.md).
 
 ## Session boundary
 
-Subagents don't survive `/resume`. Bridge sessions with `/handoff` — capture in-flight state in a doc the fresh session can read.
+Subagents don't survive `/resume`. Before a session boundary, capture in-flight state (branch, open PR, next step) somewhere the fresh session will look — the work note or the PR body.
