@@ -1,6 +1,6 @@
 # Parachute Computer — workspace meta-repo
 
-The top-level workspace for the Parachute ecosystem. Each Parachute module is its own git repo under this directory. This repo (`workspace`) tracks **workspace-level orchestration** — the conventions, skills, and agents that span the ecosystem.
+The top-level workspace for the Parachute ecosystem. Each Parachute module is its own git repo under this directory. This repo (`workspace`) tracks **workspace-level orchestration** — the conventions and skills that span the ecosystem.
 
 > ⚠️ **Read [`CLAUDE.md`](./CLAUDE.md) first.** It documents the committed-core modules, the multi-repo discipline, the architectural-shift workflow, and how Claude agents are dispatched across repos. The CLAUDE.md is canonical; this README is just an entry point.
 
@@ -9,8 +9,7 @@ The top-level workspace for the Parachute ecosystem. Each Parachute module is it
 | Path | Tracked? | Purpose |
 |---|---|---|
 | [`CLAUDE.md`](./CLAUDE.md) | ✅ | Workspace conventions + module roster + architectural-shift discipline |
-| [`.claude/agents/`](./.claude/agents) | ✅ | Custom subagent definitions (e.g. reviewer, tentacle) used across Parachute work |
-| [`.claude/commands/`](./.claude/commands) | ✅ | Custom slash commands (e.g. `/handoff`) |
+| [`.claude/skills/`](./.claude/skills) | ✅ | Workspace skills — the review roster (`review-subagents`) + the verification discipline (`verify`) |
 | `.claude/settings.local.json` | 🚫 | Operator-local — per-machine permissions, not tracked |
 | `scratch/` | ✅ | Session handoffs, process audits, thinking notes |
 | `docs/` | ✅ | Workspace-level documentation (when we accumulate it) |
@@ -48,7 +47,7 @@ The committed-core line is documented in `CLAUDE.md`. As of 2026-05-27: **vault,
 
 ## Customizing your environment
 
-Operator-local Claude Code settings go in `.claude/settings.local.json` (gitignored). The tracked `.claude/` files (agents, commands) are workspace defaults — extend them in your local fork if you want personal customizations.
+Operator-local Claude Code settings go in `.claude/settings.local.json` (gitignored). The tracked `.claude/` files (skills) are workspace defaults — extend them in your local fork if you want personal customizations.
 
 ## License
 
