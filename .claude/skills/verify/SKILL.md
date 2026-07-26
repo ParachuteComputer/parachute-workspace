@@ -52,6 +52,35 @@ The theme: **a claim is verified when you observed the real path, not a proxy fo
   DBs — fresh-DB tests prove it *can* run; fixtures prove it survives the real world.
 - When mechanical cleanup (typecheck strictness, migrations) surfaces a real runtime bug, split
   the fix into its own PR — never silence the type error with a literal that preserves the bug.
+- **Watch a new test fail before believing it.** Revert the fix (or stub the subject out), keep
+  the test, confirm it goes red *for the stated reason* — then restore. A test never seen failing
+  is an untested assertion. This caught three real problems in one night: a pager test that
+  passed on broken code, a "no results" assertion that also passes while the query is still
+  loading, and the sentinel below.
+- **A sentinel must match the signature of the thing it guards — not a channel that thing merely
+  shares.** `expect(fetch).toHaveBeenCalled()` before asserting "no band rendered" guards *"a
+  fetch happened"*, and the probe shares `fetch` with three other callers — so the guard held
+  with the probe deleted entirely. Fix: match a discriminating signature (`exclude_tag=guide`).
+  **The tell:** a guard that only has to *notice* a signal can be satisfied by any traffic on the
+  shared channel; one that has to *count* a specific signal is forced to name it. So **assert a
+  quantity or identity of the specific signal, not the presence of a shared side-effect** — and
+  apply the litmus above: delete the subject, confirm the guard fails.
+
+## Test at the scale the thing will actually meet
+
+Every fixture and sandbox we build defaults to ~15 notes and 3–4 tags. Real vaults have dozens of
+tags and thousands of notes, and code that looks correct at the first scale can be catastrophically
+wrong at the second — **it fails by working, then failing later**, which no unit test catches.
+
+Three bugs shipped in one night for exactly this reason: a filter panel that hid its own results,
+a tag page that rendered 622 rows into a 64,000px document, and an All-notes list whose pager
+buttons could never enable because a live subscription silently replaced the paged window with
+the entire vault.
+
+`bun run bigvault up` in `parachute-app` stands up ~47 tags / ~2,600 notes in one command,
+deterministically. **Use it before shipping anything that renders a list, a filter, or a tag
+surface** — and prefer a measured before/after table (DOM rows, page height, bytes on the wire,
+cold time-to-interactive) over an assertion that it "feels fine."
 
 ## Environment safety — hard rules
 
