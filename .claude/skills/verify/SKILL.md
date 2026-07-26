@@ -54,9 +54,8 @@ The theme: **a claim is verified when you observed the real path, not a proxy fo
   the fix into its own PR — never silence the type error with a literal that preserves the bug.
 - **Watch a new test fail before believing it.** Revert the fix (or stub the subject out), keep
   the test, confirm it goes red *for the stated reason* — then restore. A test never seen failing
-  is an untested assertion. This caught three real problems in one night: a pager test that
-  passed on broken code, a "no results" assertion that also passes while the query is still
-  loading, and the sentinel below.
+  is an untested assertion. Two catches in one night: a pager test that passed on broken code,
+  and the sentinel below.
 - **A sentinel must match the signature of the thing it guards — not a channel that thing merely
   shares.** `expect(fetch).toHaveBeenCalled()` before asserting "no band rendered" guards *"a
   fetch happened"*, and the probe shares `fetch` with three other callers — so the guard held
@@ -77,10 +76,11 @@ a tag page that rendered 622 rows into a 64,000px document, and an All-notes lis
 buttons could never enable because a live subscription silently replaced the paged window with
 the entire vault.
 
-`bun run bigvault up` in `parachute-app` stands up ~47 tags / ~2,600 notes in one command,
-deterministically. **Use it before shipping anything that renders a list, a filter, or a tag
-surface** — and prefer a measured before/after table (DOM rows, page height, bytes on the wire,
-cold time-to-interactive) over an assertion that it "feels fine."
+So: **run it against the repo's realistic-scale fixture before shipping** — each repo owns its
+own and states the trigger in its `CLAUDE.md` (parachute-app's is `bun run bigvault up`). The
+fixture must be deterministic, or a before/after comparison proves nothing. And prefer a measured
+before/after table — DOM rows, page height, bytes on the wire, cold time-to-interactive — over an
+assertion that it "feels fine."
 
 ## Environment safety — hard rules
 
