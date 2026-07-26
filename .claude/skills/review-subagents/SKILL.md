@@ -33,7 +33,8 @@ authoring recipe; adopt the shape, not the letter.)
 - All reviews run **foreground/blocking** — background reviewers starve behind long builders.
 - A post-review **delta on a security surface** (auth, deploy, credentials) gets a delta verdict
   from the same or a fresh reviewer before merge — no self-verified folds there.
-- **Serial per repo** — one PR through review and merge before the next PR in that repo.
+- **Concurrent per repo when disjoint** — serialize a repo's PRs only when they rewrite the same file (`docs/process/orchestration.md`). **A branch can be reviewed before it's a PR** and then open pre-cleared: a change of timing, never a skip.
+- **A fold gets re-checked by the same reviewer.** "Pre-cleared" describes the *commit* that was reviewed, not the branch. When findings are folded in, the PR that opens is no longer what was reviewed — so send the delta back, stating what changed and asking for a delta verdict rather than a fresh review.
 
 ## How to run a specialist
 
