@@ -12,7 +12,10 @@ Default to blocking subagents (`Agent({ subagent_type: "general-purpose" })`). S
 
 ## Per-repo discipline
 
-1. **One PR at a time per repo.** Finish through merge before the next. Side-discoveries → `gh issue create`.
+1. **Concurrent PRs per repo are fine when they're disjoint** (changed 2026-07-26 — the old rule was one-at-a-time, and it cost real throughput the first night work arrived faster than it merged: four finished branches sat behind the least important of the four). Disjoint means *no shared file with substantive edits*. Two guaranteed collisions don't count as overlap — the `package.json` version line and the top of `CHANGELOG.md` — those are a 30-second rebase and shouldn't deter you; assign the version when you open, not when you branch, and expect whichever lands second to bump again.
+   **Serialize anyway when two branches heavily rewrite the same file.** Tonight's counterexample: a views on-ramp and a tag-page extraction both restructured `ViewSurface.tsx`, and reconciling them wasn't conflict resolution — it was a component-API decision (who owns the page wrapper when the width class derives from draft state only the inner component holds). That belongs to the author, not to whoever rebases second. If you can't state the merge as "take one side plus these edits," it isn't disjoint.
+   Side-discoveries still → `gh issue create`.
+   **Reviews parallelize even when merges don't.** A branch can be reviewed before it's a PR; it then opens pre-cleared. Use that whenever the slot is busy.
 2. **Single dev branch `ag-unforced-dev`** — two branches per repo (`main` + dev). Builders work the dev branch, PR to main, reset to track main after merge. **Verify the merge succeeded (`state == MERGED`) before resetting** — a transient merge failure plus unconditional hygiene force-push has clobbered an open PR before.
 3. **Branch first, then edit.** Editing on `main` then checkout+reset wipes your own work; `git status` before any reset.
 4. **`cd` into the target repo before dispatch** — or brief the agent to `cd` as its first action. Otherwise it reads the workspace CLAUDE.md instead of the repo's and may claim the wrong task.
