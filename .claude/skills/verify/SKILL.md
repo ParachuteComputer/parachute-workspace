@@ -24,6 +24,35 @@ stricter-looking check can be the vacuous one if the harness can't observe it
 (`scrollWidth <= clientWidth` reads as rigorous but is permanently `0/0` under jsdom's
 `css: false`; a plain className check was the real signal there).
 
+## Ask what's RUNNING, not what's reported — compare identity, not description
+
+**A version string, a status column, and a git tag all describe intent. Compare artifact
+identity instead** — the served asset's hash against the one you just built, the published
+tarball's manifest against the source, newest tag against newest npm version. Description
+and reality drift silently, and *every* surface signal stays green while they do.
+
+Three instances in one day (2026-07-27/28), each invisible to the obvious check:
+- Hub served the app out of bun's install cache — a months-old published version — for nine
+  hours, while `parachute status` reported `bun-linked → <repo> @ <sha>`. True of
+  *resolution*, false of *what was served*. Caught only by noticing the served
+  `/assets/index-<hash>.js` didn't exist in the checkout's `dist/`.
+- Five packages had merged-but-unpublished versions (app 4 versions, hub 6 commits, notes-ui
+  6 minors, `door-contract` tagged-but-404'd, `account-client` never first-published).
+  Nothing asserts **merged == published**, so a *security* bump was merged, tagged,
+  changelogged — and in effect nowhere.
+- That tagged release had failed at the registry PUT five days earlier. Red run, no alert,
+  everyone assumed it shipped. (`dist.attestations` absent on npm ⇒ hand-published ⇒
+  probably no Trusted Publishing rule ⇒ its next tag 404s.)
+
+So: fetch the artifact and diff it. `curl` the bundle and check its hash exists in `dist/`;
+`npm pack <pkg>@<ver>` and read the tarball rather than the repo; `git ls-remote --tags` vs
+`npm view versions`. When a service reports a version, ask **which path did it read that
+from** — a cached registration and the bytes on disk are different questions.
+
+Corollary for probes: **grep the URL or the file directly.** A minified bundle is one
+~540 KB line; `$(curl …)` + `echo | grep` mangles it and returns false negatives that look
+exactly like "the fix isn't deployed."
+
 ## Before opening a PR
 
 - Exercise the change end-to-end through the operator's real flow — the bun-linked
