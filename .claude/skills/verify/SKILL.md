@@ -11,6 +11,19 @@ description: >-
 
 The theme: **a claim is verified when you observed the real path, not a proxy for it.**
 
+## Before trusting a verification artifact
+
+**State what it would look like if the thing were broken. If the answer is "the same
+thing," it isn't evidence** — true of pass counts (an assertion that stops executing
+disappears, it doesn't fail, and the count can even climb as unrelated cases land while
+the blind spot holds steady), screenshots (proof of what you looked at, not what's in it
+— a "this section rendered" shot can contain the exact bug you're about to miss), and
+"green" itself (a skipped suite, a no-op'd job, and a harness that can't observe what it
+asserts all report success). Rigor is a property of the harness, not the assertion — a
+stricter-looking check can be the vacuous one if the harness can't observe it
+(`scrollWidth <= clientWidth` reads as rigorous but is permanently `0/0` under jsdom's
+`css: false`; a plain className check was the real signal there).
+
 ## Before opening a PR
 
 - Exercise the change end-to-end through the operator's real flow — the bun-linked
