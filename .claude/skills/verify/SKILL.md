@@ -94,6 +94,21 @@ exactly like "the fix isn't deployed."
   DBs — fresh-DB tests prove it *can* run; fixtures prove it survives the real world.
 - When mechanical cleanup (typecheck strictness, migrations) surfaces a real runtime bug, split
   the fix into its own PR — never silence the type error with a literal that preserves the bug.
+- **A test that pins an absolute date and then compares against the real clock is a bomb with a
+  fuse.** It passes until the fuse burns, then fails forever — and it fails for a reason that has
+  nothing to do with the commit that surfaced it. Hub's operator-token test minted at a pinned
+  2026-04-26 with a 90-day TTL and validated at real `now`: green until 2026-07-25, red every run
+  after. **Inject the clock on BOTH sides**, or mint relative to real now. When triaging one of
+  these, sweep for siblings *structurally* rather than by listing date literals — ask which code
+  paths enforce expiry against a clock you can't inject (in hub, only jose; everything the hub
+  owns takes an injected `now`), then intersect that with pinned mints. That argument bounds the
+  class; a list of `new Date("20…")` hits does not.
+- **A gate that doesn't run is indistinguishable from a gate that passes.** Know *when* each gate
+  last actually executed, not just its last colour. Hub's suite runs at tag time (PR CI is
+  container-smoke only), so the bomb above sat red for three days inside a repo that looked
+  entirely green; parachute-agent's `main` went red on a **docs-only** commit, meaning the real
+  breakage had landed earlier and unobserved. Corollary: **never let a stable release be a line's
+  first gate run** — cut an rc, let the gate run, promote on green.
 - **Watch a new test fail before believing it.** Revert the fix (or stub the subject out), keep
   the test, confirm it goes red *for the stated reason* — then restore. A test never seen failing
   is an untested assertion. Two catches in one night: a pager test that passed on broken code,
