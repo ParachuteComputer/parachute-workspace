@@ -33,6 +33,6 @@ Read `Current/Parachute` via the `parachute-parachute` MCP, then the work board 
 
 ## Local dev
 
-Modules run **bun-linked** from checkouts — `parachute start <svc>` follows the checked-out branch (short service names: `restart surface`, not `restart parachute-surface`). After merging a frontend bump: `bun run build` in the repo, then `parachute restart <svc>`. Post-merge sync: `git fetch && git pull --ff-only` in affected repos (skip repos with uncommitted work); pull `main` before starting any new work.
+Modules run **bun-linked** from checkouts — `parachute start <svc>` follows the checked-out branch (short service names: `restart surface`, not `restart parachute-surface`). **A restart serves whatever the checkout currently has on disk, triggered by Aaron, a crash-respawn, or another session, not just you — so branch work in these repos belongs in a worktree, checkout restored to `main` when done** ([docs/process/orchestration.md](./docs/process/orchestration.md)). After merging a frontend bump: `bun run build` in the repo, then `parachute restart <svc>`. Post-merge sync: `git fetch && git pull --ff-only` in affected repos (skip repos with uncommitted work); pull `main` before starting any new work.
 
 @docs/index.md
