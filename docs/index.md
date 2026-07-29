@@ -1,6 +1,6 @@
 # Workspace docs — index
 
-- [process/governance.md](process/governance.md) — the three rules (no auto-merge · RC versioning · contracts check), PR flow, external PRs, npm-publish-via-tag-CI, the migration-file discipline
+- [process/governance.md](process/governance.md) — the three rules (no auto-merge · version-bumps-in-release-PRs · contracts check), PR flow, external PRs, publish-on-merge, the migration-file discipline
 - [process/orchestration.md](process/orchestration.md) — the dispatch model: orchestrator vs builders, briefing, verifying agent outputs, the reviewer gate, session boundaries
 - [process/development.md](process/development.md) — the dev ritual in full (Orient/Claim/Log/Release), the GitHub-issues boundary, working without vault access
 - [process/context.md](process/context.md) — context-engineering conventions: gotchas-only CLAUDE.md, skills for process, one home per instruction
