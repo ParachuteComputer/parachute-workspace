@@ -1,0 +1,46 @@
+# Self-contained Parachute e2e stack.
+#
+# NOTHING here touches the host's Parachute. No bind mount into ~/.parachute,
+# no host tokens, no host ports for the live services. Vaults are scratch:
+# created on first boot, gone with `docker compose down -v`.
+#
+# Images are built by `run.sh` rather than by compose, because the Dockerfiles
+# live here in the harness while the build CONTEXT is a module checkout (or a
+# git worktree of one). Compose's `dockerfile:` is resolved relative to the
+# context, which can't express that; `docker build -f <here> <there>` can.
+#
+# Two services, one origin: Caddy fronts the app and proxies /vault/* to the
+# vault, so the browser sees a single-origin install — the shape self-hosted
+# Parachute actually ships, and one with no CORS in the way.
+
+name: parachute-e2e
+
+services:
+  vault:
+    image: ${E2E_VAULT_IMAGE:-parachute-vault:e2e-fixed}
+    environment:
+      # Auto-create a scratch vault on first boot; without this the server
+      # comes up with no vaults at all and every route 404s.
+      PARACHUTE_VAULT_NAME: demo
+      # Server-wide bearer. A FIXTURE, not a secret: it only ever
+      # authenticates against a throwaway vault inside this stack. Using it
+      # is what lets the harness skip hub entirely — no OAuth, no issuer
+      # trust to configure, no second service to keep alive.
+      VAULT_AUTH_TOKEN: ${E2E_VAULT_TOKEN:-e2e-scratch-token-not-a-secret}
+      TRANSCRIPTION_PROVIDER: whisper-cpp
+      TRANSCRIPTION_MODEL: whisper-tiny.en
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:1940/health"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+  app:
+    image: ${E2E_APP_IMAGE:-parachute-app:e2e}
+    ports:
+      # Deliberately NOT 1939/1940/1944 — those are the host's live Parachute.
+      - "${E2E_APP_PORT:-18080}:8080"
+    depends_on:
+      vault:
+        condition: service_healthy

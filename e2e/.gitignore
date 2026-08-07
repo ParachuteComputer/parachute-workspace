@@ -1,0 +1,6 @@
+# Run output: videos, traces, screenshots, HTML report. Regenerated on every
+# run and often tens of MB — the artifact belongs attached to a PR or uploaded,
+# never committed.
+artifacts/
+node_modules/
+package-lock.json

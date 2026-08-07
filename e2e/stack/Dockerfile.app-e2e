@@ -1,0 +1,45 @@
+# Parachute App + Caddy — E2E harness image. NOT a deployment artifact.
+#
+# Builds the app's static bundle and serves it behind Caddy, which ALSO
+# reverse-proxies `/vault/*` to the vault container. Serving both from one
+# origin is deliberate: it removes CORS and the browser's cross-origin
+# storage rules from the test entirely, so a failure in the video is a
+# failure in the product rather than in the harness's plumbing.
+#
+# The app is built from a checkout passed as the build context — the same
+# arrangement as the vault image, so "before" and "after" differ only by
+# which context is passed. The Caddy config is written here rather than
+# COPYd, because the build context is the app checkout and does not (and
+# should not) contain harness files.
+
+ARG BUN_VERSION=1.3
+FROM oven/bun:${BUN_VERSION} AS builder
+
+WORKDIR /app
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --ignore-scripts
+
+COPY . .
+
+# VITE_BASE_PATH=/ is the stand-alone shape: the bundle is built for the
+# origin root, which is where Caddy serves it.
+ENV VITE_BASE_PATH=/
+RUN bun run build && test -d dist && test -f dist/index.html
+
+FROM caddy:2-alpine AS runtime
+COPY --from=builder /app/dist /srv
+
+RUN printf '%s\n' \
+  ':8080 {' \
+  '	handle /vault/* {' \
+  '		reverse_proxy vault:1940' \
+  '	}' \
+  '	handle {' \
+  '		root * /srv' \
+  '		try_files {path} /index.html' \
+  '		file_server' \
+  '	}' \
+  '}' > /etc/caddy/Caddyfile \
+ && caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+
+EXPOSE 8080
