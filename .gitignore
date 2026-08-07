@@ -37,6 +37,20 @@ docs/historical/*
 !scratch/
 !scratch/**
 
+# ── Allowlist: the e2e video harness ──
+# Containerised browser stack that records a video of a change working end to
+# end. Lives at workspace level rather than in a module repo because the stack
+# spans vault + app, and "a PR arrives with a video" is a workspace practice.
+!e2e/
+!e2e/**
+
+# ── Within e2e/: run output is never tracked ──
+# Videos, traces, screenshots and the HTML report are regenerated every run and
+# run to tens of MB. The artifact belongs attached to a PR, not in history.
+e2e/artifacts/
+e2e/node_modules/
+e2e/package-lock.json
+
 # ── Allowlist: .claude/ workspace customization ──
 # Custom agents, slash commands, workspace-level settings.
 # NOT user-level state (history, cache, etc. — those live in ~/.claude/).
