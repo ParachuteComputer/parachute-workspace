@@ -1,0 +1,52 @@
+[
+  {
+    "id": "01",
+    "step": "open",
+    "text": "So this is the Parachute app, running against a throwaway vault in a container. I want to show you the thing you reported this morning, and what it took to fix it. We're on the new note screen — this is where you'd normally hit record."
+  },
+  {
+    "id": "02",
+    "step": "point_mic",
+    "text": "And there's the microphone. On your machine this morning, that button wasn't here. In its place was a line saying voice transcription isn't enabled on this vault, which is what sent you looking."
+  },
+  {
+    "id": "03",
+    "step": "explain",
+    "text": "Here's what was actually happening. Your vault is configured to transcribe with whisper, and the transcription worker was starting up correctly the whole time. But the app doesn't ask the worker. It checks a capability flag, and that flag didn't know whisper existed — it fell through to a provider that was retired months ago, found nothing there, and reported transcription as unavailable. So the engine worked. The flag lied. And the flag is what decides whether you see this button."
+  },
+  {
+    "id": "04",
+    "step": "record",
+    "text": "So let's use it. I'm clicking record now, and it's capturing audio — a real microphone stream, not a simulated one. The browser here is being fed a known audio file so the whole thing stays repeatable."
+  },
+  {
+    "id": "05",
+    "step": "stop",
+    "text": "Stopping. You can see it captured five seconds, and the transcribe toggle is on by default. Nothing has gone to the vault yet — the recording is still sitting in the page."
+  },
+  {
+    "id": "06",
+    "step": "retention",
+    "text": "First voice note in a vault, so it asks once whether to keep the audio after transcribing. I'll keep it, which means the original recording stays attached to the note alongside the text."
+  },
+  {
+    "id": "07",
+    "step": "save",
+    "text": "Now I'll save. This is the moment the audio actually uploads and the vault sees a new attachment, which is what kicks off transcription."
+  },
+  {
+    "id": "08",
+    "step": "transcribing",
+    "text": "And there it is — transcribing. The note exists now, the audio is attached, and whisper is running on it in the background. This is the second half of the fix, by the way: readiness now also checks for ffmpeg, because every recording gets transcoded before transcription. Without that check, the app would happily offer you a microphone that fails on every single take."
+  },
+  {
+    "id": "09",
+    "step": "transcript",
+    "text": "And the transcript lands. That's the fixture phrase, transcribed by whisper running inside the container, written into the note with the audio still attached. That whole path — microphone, upload, transcode, transcription, note — is what a unit test can't reach, and it's why this is a screen recording instead of a green checkmark."
+  },
+  {
+    "id": "10",
+    "step": "close",
+    "text": "This same walkthrough runs against a build from main, and it stops at the second step, because the microphone isn't there. That pairing is the actual evidence. Two pull requests are waiting on you — the fix itself, and the harness that produced this recording."
+  }
+]
