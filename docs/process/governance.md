@@ -23,7 +23,7 @@ Settled 2026-04-25; contracts-check wording updated 2026-07-03 (`Decisions/2026-
 ## PR flow
 
 - **Concurrent when disjoint, bundled within**: feature PRs target `next`, not `main` (rule 1); concurrent PRs per repo are fine when they don't collide (see `orchestration.md` for the test); one PR per coherent session of work (multiple commits fine). Side-discoveries → `gh issue create` rather than widening the PR.
-- **Reviewer nits relevant to the diff fold inline** (same PR, same rc); out-of-scope findings become issues.
+- **Reviewer nits relevant to the diff fold inline** (same PR); out-of-scope findings become issues.
 - **Verified-conditional merge**: after `gh pr merge` (into `next`, or Aaron's `next → main`), confirm `state == MERGED` before any hygiene (reset/force-push of the dev branch) — transient merge failures + unconditional hygiene have clobbered open PRs before.
 - **Never merge on a red/UNSTABLE gate without reading it.** Don't assume a red gate is pre-existing.
 - **External PRs** require Aaron's identity-verified approval — never merge outside-contributor code on code-scope alone.
