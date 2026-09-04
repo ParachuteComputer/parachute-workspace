@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "description": "Containerised end-to-end harness: real browser, real vault, real engine, video out.",
   "devDependencies": {
+    "@noble/curves": "^2.3.0",
     "@playwright/test": "1.58.2"
   }
 }
