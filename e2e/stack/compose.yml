@@ -12,6 +12,13 @@
 # Two services, one origin: Caddy fronts the app and proxies /vault/* to the
 # vault, so the browser sees a single-origin install — the shape self-hosted
 # Parachute actually ships, and one with no CORS in the way.
+#
+# A THIRD service, `hub`, is deliberately NOT behind that Caddy. The hub is its
+# own origin (`http://hub:1939`) because the Nostr key door binds the signed
+# event's `u` tag to an origin the hub itself answers on, and because the hub's
+# own paths (/login, /admin, /api, /oauth) would collide with the app's SPA
+# routes if both were mounted at one origin. The door spec is the only spec
+# that talks to it; the other specs never notice it is there.
 
 name: parachute-e2e
 
@@ -34,6 +41,43 @@ services:
       interval: 3s
       timeout: 3s
       retries: 30
+      start_period: 5s
+
+  # The hub, for the Nostr key door only (specs/nostr-key-door.spec.ts).
+  #
+  # Built by run.sh from a parachute-hub CHECKOUT using the hub repo's own
+  # `Dockerfile` — the real deployment artifact, not a harness-local one. The
+  # door (hub#949/#951), `GET /login/2fa`, `parachute auth link-pubkey` and
+  # `PARACHUTE_NOSTR_LOGIN_2FA` all land on hub `next` and are in no published
+  # npm release, so building from a ref is the only way to test them at all.
+  hub:
+    image: ${E2E_HUB_IMAGE:-parachute-hub:e2e}
+    environment:
+      # LOAD-BEARING. `linkageBoundOrigins` deliberately DROPS a Host-derived
+      # issuer (hub#833 MEDIUM-1), so without this the only bound origins are
+      # the loopback aliases and every signed `u` tag naming `http://hub:1939`
+      # is refused as `invalid_event`. Setting it makes the issuer env-sourced,
+      # which is trusted, and the browser, the event template and the verify
+      # check then all name the same origin.
+      PARACHUTE_HUB_ORIGIN: http://hub:1939
+      # First-boot admin seed. FIXTURES on a throwaway hub whose DB lives in an
+      # anonymous volume destroyed by `docker compose down -v`. Not "admin":
+      # that username is waived past the reserved-word check but is flagged
+      # unlinkable for the pubkey ceremony, which is the whole subject here.
+      PARACHUTE_INITIAL_ADMIN_USERNAME: ${E2E_HUB_USER:-keyholder}
+      PARACHUTE_INITIAL_ADMIN_PASSWORD: e2e-scratch-password-not-a-secret
+      # The seeded admin enrolls no TOTP, so the divert would never fire — this
+      # is set anyway so the spec is proving the key door and not accidentally
+      # depending on the absence of an enrollment. `off` is the ONLY spelling
+      # that disables it.
+      PARACHUTE_NOSTR_LOGIN_2FA: "off"
+    healthcheck:
+      # busybox wget, not curl: the hub image is alpine and ships neither curl
+      # nor a shell healthcheck helper.
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:1939/health"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
       start_period: 5s
 
   app:

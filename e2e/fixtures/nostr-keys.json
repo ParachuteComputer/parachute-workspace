@@ -1,0 +1,28 @@
+{
+  "_comment": [
+    "Throwaway BIP-340 keypairs for the Nostr key-door spec. FIXTURES, not secrets —",
+    "the same posture as `VAULT_AUTH_TOKEN` in stack/compose.yml. Each one was generated",
+    "for this file, has never signed anything else, and authenticates nothing but a hub",
+    "container that is created and destroyed by `run.sh`. Committing them is what lets the",
+    "seeding step (`parachute auth link-pubkey`, which runs before the browser starts) and",
+    "the browser's signer agree on a key without a handshake between run.sh and the spec.",
+    "",
+    "Three keys, because the negatives need distinct states that must not interfere:",
+    "  linked        — bound to the seeded hub user by run.sh; the happy path signs with it",
+    "  linkedForUnlink — ALSO bound to the same user, so the 'unlinked after login' case can",
+    "                  drop its own link without breaking the happy-path key",
+    "  neverLinked   — bound to nothing on any hub; the unknown_pubkey case signs with it"
+  ],
+  "linked": {
+    "secret": "a73fb6c58c52b2e35c82bf70dcb557cb19f8bc2f2935cc6663cd9dd7c3ae43f4",
+    "pubkey": "ef29845187b79eefe2338f8343f6d0326416f039b606a1bd23af7a5a66c3acd5"
+  },
+  "linkedForUnlink": {
+    "secret": "3249342142ccbbc20c272df88e92a9e87741393fddd2da17000f15e891d17cc7",
+    "pubkey": "94958bfd3922a3ca00150963a7dd9ed6d05b67afd13884040526783cdd9df0ea"
+  },
+  "neverLinked": {
+    "secret": "b41fc75261456a41129b5a2ffaf3cd24a4b8082d30d2f84ce62afee4d8c06a3f",
+    "pubkey": "3bddf841a8576bedf3520aeca98e9b355d8a08f0d07fc81e91df2d881f618f30"
+  }
+}
